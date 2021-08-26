@@ -5,9 +5,13 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SignalRExampleProject.Domain;
+using SignalRExampleProject.Domain.Entitties;
 using SignalRExampleProject.Hubs;
 
 namespace SignalRExampleProject
@@ -24,7 +28,30 @@ namespace SignalRExampleProject
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<SignalRDbContext>(options =>
+                options.UseSqlServer(
+                    Configuration.GetConnectionString("DefaultConnection"),
+                    x => x.MigrationsAssembly(typeof(SignalRDbContext).Assembly.FullName)));
+
+            services.AddIdentity<ApplicationUser, ApplicationRole>(config =>
+            {
+                config.Password.RequireDigit = false;
+                config.Password.RequireLowercase = false;
+                config.Password.RequireNonAlphanumeric = false;
+                config.Password.RequireUppercase = false;
+                config.Password.RequiredLength = 4;
+                config.SignIn.RequireConfirmedEmail = false;
+
+                config.Lockout.AllowedForNewUsers = false;
+                config.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(2);
+                config.Lockout.MaxFailedAccessAttempts = 5;
+            })
+                .AddEntityFrameworkStores<SignalRDbContext>()
+                .AddDefaultTokenProviders();
+
+            services.AddHttpContextAccessor();
             services.AddSignalR();
+
             services.AddControllersWithViews();
         }
 
@@ -46,6 +73,8 @@ namespace SignalRExampleProject
 
             app.UseRouting();
 
+
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

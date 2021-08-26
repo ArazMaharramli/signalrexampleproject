@@ -1,14 +1,30 @@
 ﻿using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
+using SignalRExampleProject.Domain.Entitties;
 
 namespace SignalRExampleProject.Hubs
 {
+    [Authorize]
     public class ChatHub : Hub
     {
-        public async Task SendMessage(string user, string message)
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public ChatHub(UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
         {
-            await Clients.All.SendAsync("ReceiveMessage", user, message);
+            _userManager = userManager;
+            _httpContextAccessor = httpContextAccessor;
+        }
+
+        public async Task SendMessage(string message)
+        {
+            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var user = await _userManager.FindByIdAsync(userId);
+            await Clients.All.SendAsync("ReceiveMessage", user.UserName, message);
         }
     }
 }
