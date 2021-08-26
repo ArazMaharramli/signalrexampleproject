@@ -14,17 +14,20 @@ namespace SignalRExampleProject.Hubs
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
+
         public ChatHub(UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
         {
             _userManager = userManager;
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task SendMessage(string message)
+        public async Task SendMessage(string receiverUserId, string message)
         {
             var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var user = await _userManager.FindByIdAsync(userId);
-            await Clients.All.SendAsync("ReceiveMessage", user.UserName, message);
+            await Clients.User(receiverUserId).SendAsync("ReceiveMessage", user.UserName, message);
         }
+
+
     }
 }
