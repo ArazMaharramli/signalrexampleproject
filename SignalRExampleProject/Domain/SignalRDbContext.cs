@@ -13,6 +13,10 @@ namespace SignalRExampleProject.Domain
         {
 
         }
+        public DbSet<Group> Groups { get; set; }
+        public DbSet<PrivateMessage> PrivateMessages { get; set; }
+        public DbSet<GroupMessage> GroupMessages { get; set; }
+
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
         {
             return base.SaveChangesAsync(cancellationToken);
