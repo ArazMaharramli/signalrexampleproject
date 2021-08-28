@@ -4,8 +4,8 @@ var connection = new signalR.HubConnectionBuilder().withUrl("/chathub").build();
 
 //Disable send button until connection is established
 document.getElementById("sendButton").disabled = true;
-
-connection.on("ReceiveMessage", function (user, message) {
+//"ReceiveMessage"
+connection.on(getReceiverId(), function (user, message) {
     AddMessageToUI(user, message);
 });
 
@@ -19,10 +19,12 @@ connection.start().then(function () {
 document.getElementById("sendButton").addEventListener("click", function (event) {
     var receiverUserId = $('#ReceiverId').val();
     var message = document.getElementById("messageInput").value;
-    connection.invoke("SendMessage", receiverUserId, message).catch(function (err) {
-        return console.error(err.toString());
-    });
-    AddMessageToUI("You", message);
+    connection.invoke("SendMessage", receiverUserId, message)
+        .then(function () {
+            AddMessageToUI("You", message);
+        }).catch(function (err) {
+            return console.error(err);
+        });
     event.preventDefault();
 });
 

@@ -30,5 +30,11 @@
         <ul id="messagesList"></ul>
     </div>
 </div>
-<script src="~/js/signalr/dist/browser/signalr.js"></script>
-<script src="~/js/chat.js"></script>
+
+@section Scripts{
+    <script>function getReceiverId() {
+            return $('#ReceiverId').val();
+        };</script>
+    <script src="~/js/signalr/dist/browser/signalr.js"></script>
+    <script src="~/js/chat.js"></script>
+}

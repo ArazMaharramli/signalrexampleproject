@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SignalRExampleProject.Domain;
 
 namespace SignalRExampleProject.domain.Migrations
 {
     [DbContext(typeof(SignalRDbContext))]
-    partial class SignalRDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210828161453_userconnectionsaddedandgroupsupdated")]
+    partial class userconnectionsaddedandgroupsupdated
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -248,7 +250,7 @@ namespace SignalRExampleProject.domain.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Connections");
+                    b.ToTable("Connection");
                 });
 
             modelBuilder.Entity("SignalRExampleProject.Domain.Entitties.Group", b =>

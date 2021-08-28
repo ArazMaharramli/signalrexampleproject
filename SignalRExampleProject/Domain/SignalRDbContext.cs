@@ -14,6 +14,7 @@ namespace SignalRExampleProject.Domain
 
         }
         public DbSet<Group> Groups { get; set; }
+        public DbSet<Connection> Connections { get; set; }
         public DbSet<PrivateMessage> PrivateMessages { get; set; }
         public DbSet<GroupMessage> GroupMessages { get; set; }
 

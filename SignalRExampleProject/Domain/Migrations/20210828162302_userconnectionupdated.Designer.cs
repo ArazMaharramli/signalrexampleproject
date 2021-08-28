@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SignalRExampleProject.Domain;
 
 namespace SignalRExampleProject.domain.Migrations
 {
     [DbContext(typeof(SignalRDbContext))]
-    partial class SignalRDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210828162302_userconnectionupdated")]
+    partial class userconnectionupdated
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

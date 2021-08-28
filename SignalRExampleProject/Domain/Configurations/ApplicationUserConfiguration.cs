@@ -9,7 +9,11 @@ namespace SignalRExampleProject.Domain.Configurations
     {
         public void Configure(EntityTypeBuilder<ApplicationUser> builder)
         {
+            builder.HasMany(x => x.Groups)
+                .WithMany(x => x.Users);
 
+            builder.HasMany(x => x.Connections)
+                .WithOne(x => x.User);
         }
     }
 }

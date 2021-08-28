@@ -39,7 +39,8 @@ namespace SignalRExampleProject.Hubs
                 Text = message
             });
             await _dbContext.SaveChangesAsync();
-            await Clients.User(receiver.Id).SendAsync("ReceiveMessage", sender.UserName, message);
+            //"ReceiveMessage"
+            await Clients.User(receiver.Id).SendAsync(sender.Id, sender.UserName, message);
         }
 
         public async Task GetOldMessages()
@@ -49,10 +50,63 @@ namespace SignalRExampleProject.Hubs
 
             foreach (var x in messages)
             {
-                var sender = x.SenderId == userId ? "You" : (await _userManager.FindByIdAsync(x.SenderId)).UserName;
-                await Clients.User(userId).SendAsync("ReceiveMessage", sender, x.Text);
+                var sender = await _userManager.FindByIdAsync(x.SenderId);
+                var senderName = x.SenderId == userId ? "You" : sender.UserName;
+                //"ReceiveMessage"
+                await Clients.User(userId).SendAsync(sender.Id, senderName, x.Text);
             }
 
+        }
+
+        public override Task OnConnectedAsync()
+        {
+            string userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var user = _dbContext.Users
+                .Include(x => x.Groups)
+                .Include(x => x.Connections)
+                .SingleOrDefault(x => x.Id == userId);
+
+            var userConnection = user.Connections.SingleOrDefault(x => x.ConnectionID == Context.ConnectionId);
+
+            if (userConnection is null)
+            {
+                user.Connections.Add(new Connection
+                {
+                    ConnectionID = Context.ConnectionId,
+                    Connected = true,
+                });
+            }
+            else
+            {
+                userConnection.Connected = true;
+            }
+
+            _dbContext.SaveChanges();
+
+            foreach (var group in user.Groups)
+            {
+                Groups.AddToGroupAsync(Context.ConnectionId, group.Id);
+            }
+            return base.OnConnectedAsync();
+        }
+
+        public override Task OnDisconnectedAsync(Exception? exception)
+        {
+
+            string userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var user = _dbContext.Users
+                .Include(x => x.Connections)
+                .SingleOrDefault(x => x.Id == userId);
+
+            var userConnection = user.Connections.SingleOrDefault(x => x.ConnectionID == Context.ConnectionId);
+
+            if (userConnection is not null)
+            {
+                userConnection.Connected = false;
+            }
+
+            _dbContext.SaveChanges();
+            return base.OnDisconnectedAsync(exception);
         }
     }
 }
