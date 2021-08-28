@@ -1,6 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace SignalRExampleProject.ViewModels
 {
@@ -11,9 +9,5 @@ namespace SignalRExampleProject.ViewModels
         [Required]
         [DataType(DataType.Password)]
         public string Password { get; set; }
-    }
-    public class ChatViewModel
-    {
-        public SelectList Users { get; set; }
     }
 }

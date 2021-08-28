@@ -50,7 +50,7 @@ namespace SignalRExampleProject.Hubs
             foreach (var x in messages)
             {
                 var sender = x.SenderId == userId ? "You" : (await _userManager.FindByIdAsync(x.SenderId)).UserName;
-                await Clients.User(userId).SendAsync("ReceiveOldMessages", sender, x.Text);
+                await Clients.User(userId).SendAsync("ReceiveMessage", sender, x.Text);
             }
 
         }

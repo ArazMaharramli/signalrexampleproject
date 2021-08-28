@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -29,12 +30,28 @@ namespace SignalRExampleProject.Controllers
 
         public async Task<IActionResult> IndexAsync()
         {
-            var users = await _signalRDbContext.Users.ToListAsync();
-            var model = new ChatViewModel
+            var users = await _signalRDbContext.Users.Where(x => x.Id != HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value).ToListAsync();
+            var model = new IndexViewModel
             {
-                Users = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(users, nameof(ApplicationUser.Id), nameof(ApplicationUser.UserName))
+                Users = users.Select(x => (x.Id, x.UserName)).ToList()
             };
             return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ChatAsync([FromQuery] string user)
+        {
+            var receiver = await _signalRDbContext.Users.FindAsync(user);
+            if (receiver is not null)
+            {
+                var model = new ChatViewModel
+                {
+                    ReceiverId = receiver.Id,
+                    ReceiverName = receiver.UserName
+                };
+                return View(model);
+            }
+            return BadRequest();
         }
 
         public IActionResult Privacy()
