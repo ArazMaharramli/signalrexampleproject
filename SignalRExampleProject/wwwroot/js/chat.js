@@ -36,7 +36,9 @@ function AddMessageToUI(user, message) {
 
 function GetOldMessages() {
     document.getElementById("messagesList").innerHTML = "";
-    connection.invoke("GetOldMessages").catch(function (err) {
+
+    var senderId = $('#ReceiverId').val();
+    connection.invoke("GetOldMessages", senderId).catch(function (err) {
         return console.error(err.toString());
     });
 }

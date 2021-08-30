@@ -43,17 +43,24 @@ namespace SignalRExampleProject.Hubs
             await Clients.User(receiver.Id).SendAsync(sender.Id, sender.UserName, message);
         }
 
-        public async Task GetOldMessages()
+        public async Task GetOldMessages(string senderId)
         {
             var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var messages = await _dbContext.PrivateMessages.Where(x => x.ReceiverId == userId).ToListAsync();
+            var messages = await _dbContext.PrivateMessages
+                .Where(
+                    x => (x.ReceiverId == userId && x.SenderId == senderId) ||
+                    (x.ReceiverId == senderId && x.SenderId == userId))
+                .OrderBy(x => x.CreateDate)
+                .ToListAsync();
 
             foreach (var x in messages)
             {
                 var sender = await _userManager.FindByIdAsync(x.SenderId);
                 var senderName = x.SenderId == userId ? "You" : sender.UserName;
+                var receiveMessageFuncName = x.SenderId == userId ? x.ReceiverId : sender.Id;
+
                 //"ReceiveMessage"
-                await Clients.User(userId).SendAsync(sender.Id, senderName, x.Text);
+                await Clients.User(userId).SendAsync(receiveMessageFuncName, senderName, x.Text);
             }
 
         }
