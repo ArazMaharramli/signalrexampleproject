@@ -41,7 +41,10 @@ namespace SignalRExampleProject.Hubs
             await _dbContext.SaveChangesAsync();
             //"ReceiveMessage"
             await Clients.User(receiver.Id).SendAsync(sender.Id, sender.UserName, message);
+
+            await SendNotification(receiver.Id, $"/home/chat?user={sender.Id}", $"{sender.UserName} sent you a message.");
         }
+
 
         public async Task GetOldMessages(string senderId)
         {
@@ -94,6 +97,7 @@ namespace SignalRExampleProject.Hubs
             {
                 Groups.AddToGroupAsync(Context.ConnectionId, group.Id);
             }
+
             return base.OnConnectedAsync();
         }
 
@@ -115,5 +119,12 @@ namespace SignalRExampleProject.Hubs
             _dbContext.SaveChanges();
             return base.OnDisconnectedAsync(exception);
         }
+
+        #region notification
+        private Task SendNotification(string receiverId, string header, string message)
+        {
+            return Clients.User(receiverId).SendAsync("ReceiveNotification", header, message);
+        }
+        #endregion
     }
 }

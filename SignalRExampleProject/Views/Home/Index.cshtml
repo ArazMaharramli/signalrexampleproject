@@ -1,12 +1,14 @@
 ﻿@model SignalRExampleProject.ViewModels.IndexViewModel
 
+<div id="notificationPanel" class="container" style="background-color:aquamarine;">
+
+</div>
 <div class="container">
     <div class="row">&nbsp;</div>
     @foreach (var item in Model.Users)
     {
-
         <div class="row">
-            <div class="col-2">Messages</div>
+            <div class="col-2">User</div>
             <div class="col-4">
                 <a asp-controller="Home" asp-action="Chat" asp-route-user="@item.Id">@item.UserName</a>
             </div>
@@ -19,3 +21,8 @@
         </div>
     }
 </div>
+
+@section Scripts{
+    <script src="~/js/signalr/dist/browser/signalr.js"></script>
+    <script src="~/js/notification.js"></script>
+}
